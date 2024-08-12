@@ -14,7 +14,11 @@ HEIGHT = 700
 GRID_SIZE = 180
 X_OFFSET = 120
 Y_OFFSET = 220
-HOLES_GRID = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+HOLES_GRID = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+]
 FPS = 60
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -234,5 +238,5 @@ def main():
     pygame.quit()
 
 
-# if __name__ == "__main__":
-main()
+if __name__ == '__main__':
+    main()
