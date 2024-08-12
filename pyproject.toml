@@ -1,0 +1,73 @@
+[project]
+name = "Wack a Mole"
+description = "The good old `Whack a Mole` game developed with `PyGame`"
+license = "MIT"
+version = "1.0.0"
+readme = "README.md"
+requires-python = ">= 3.12"
+
+
+[tool.ruff]
+# https://docs.astral.sh/ruff/configuration/
+# https://docs.astral.sh/ruff/settings
+line-length = 120
+indent-width = 4
+
+target-version = "py312"
+
+cache-dir = "~/.cache/ruff"
+
+exclude = [
+    "__pycache__",
+    ".git",
+    ".ruff_cache",
+    ".idea",
+    ".vscode",
+]
+
+include = [
+    "main.py",
+    "pyproject.toml",
+]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+#select = ["E4", "E7", "E9", "F"]
+#ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+#dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
+
+[tool.ruff.format]
+# use single quotes for strings.
+quote-style = "single"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Line endings will be converted to \n. The default line ending on Unix.
+line-ending = "lf"
+
+# Enable reformatting of code snippets in docstrings.
+docstring-code-format = true
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"

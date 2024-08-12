@@ -1,10 +1,3 @@
-##########################################################
-# Programmer: Michal Ilyayev
-# Date: 18/06/2024
-# File Name: final.py
-# Description: This is the final version of the game
-##########################################################
-
 import pathlib
 import pygame
 import random
@@ -12,47 +5,49 @@ import random
 
 pygame.init()
 
-# ---------------------------------------#
-#         game properties                #
-# ---------------------------------------#
+# ---------------------------------------
+# game properties
+# ---------------------------------------
+
 WIDTH = 600
 HEIGHT = 700
-GRIDSIZE = 180
-XOffset = 120
-YOffset = 220
-HolesGrid = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+GRID_SIZE = 180
+X_OFFSET = 120
+Y_OFFSET = 220
+HOLES_GRID = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 FPS = 60
 
-Screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Whack a Mole")
-Clock = pygame.time.Clock()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Whack a Mole')
+clock = pygame.time.Clock()
 
-# ---------------------------------------#
-#         picture properties             #
-# ---------------------------------------#
+# ---------------------------------------
+# picture properties
+# ---------------------------------------
 
 CWD = pathlib.Path(__file__).parent
 
 # Load background images
-BackgroundFileName = pygame.image.load(CWD / "images/background.png")
-Background = pygame.transform.scale(BackgroundFileName, (WIDTH, HEIGHT))
+background_file_name = pygame.image.load(CWD / 'images/background.png')
+background = pygame.transform.scale(background_file_name, (WIDTH, HEIGHT))
 
 # Load hole image
-HoleImageFileName = pygame.image.load(CWD / "images/hole.png")
-HoleImage = pygame.transform.scale(HoleImageFileName, (120, 120))
+hole_image_file_name = pygame.image.load(CWD / 'images/hole.png')
+hole_image = pygame.transform.scale(hole_image_file_name, (120, 120))
 
 # Load and resize mole images
-MoleImageFileName = pygame.image.load(CWD / "images/mole.png")
-MoleImage = pygame.transform.scale(MoleImageFileName, (100, 100))
+mole_image_file_name = pygame.image.load(CWD / 'images/mole.png')
+mole_image = pygame.transform.scale(mole_image_file_name, (100, 100))
 
 # Load and scale bomb image
-BombImageFileName = pygame.image.load(CWD / "images/bomb.png")
-BombImage = pygame.transform.scale(BombImageFileName, (100, 100))
+bomb_image_file_name = pygame.image.load(CWD / 'images/bomb.png')
+bomb_image = pygame.transform.scale(bomb_image_file_name, (100, 100))
 
 
-# ---------------------------------------#
-#           game components              #
-# ---------------------------------------#
+# ---------------------------------------
+# game components
+# ---------------------------------------
+
 
 class Hole:
     def __init__(self, num, col, row):
@@ -61,179 +56,180 @@ class Hole:
         self.row = row
 
     def draw(self):
-        Screen.blit(HoleImage, (XOffset + self.col * GRIDSIZE - 60, YOffset + self.row * GRIDSIZE - 60))
+        screen.blit(hole_image, (X_OFFSET + self.col * GRID_SIZE - 60, Y_OFFSET + self.row * GRID_SIZE - 60))
 
 
 class Mole:
-    def __init__(self, MoleType):
-        self.MoleType = MoleType
-        self.MoleX = 0
-        self.MoleY = 0
-        self.Speed = 3
-        self.HoleNum = 0
-        self.HoleRow = 0
-        self.Move = False
-        self.Counter = 0
+    def __init__(self, mole_type):
+        self.mole_type = mole_type
+        self.mole_x = 0
+        self.mole_y = 0
+        self.speed = 3
+        self.hole_num = 0
+        self.hole_row = 0
+        self.move = False
+        self.counter = 0
 
-    def selectHole(self, takenHoles):
+    def select_hole(self, taken_holes):
         # Select a hole that is not taken
-        self.HoleNum = random.randint(0, 8)
-        while self.HoleNum in takenHoles:
-            self.HoleNum = random.randint(0, 8)
+        self.hole_num = random.randint(0, 8)
+        while self.hole_num in taken_holes:
+            self.hole_num = random.randint(0, 8)
 
-        col = self.HoleNum % 3
-        row = self.HoleNum // 3
-        self.HoleRow = YOffset + row * GRIDSIZE
-        self.MoleX = XOffset + GRIDSIZE * col
-        self.MoleY = self.HoleRow - 55
-        self.Move = True
-        self.Counter = 0
+        col = self.hole_num % 3
+        row = self.hole_num // 3
+        self.hole_row = Y_OFFSET + row * GRID_SIZE
+        self.mole_x = X_OFFSET + GRID_SIZE * col
+        self.mole_y = self.hole_row - 55
+        self.move = True
+        self.counter = 0
 
     def draw(self):
-        if self.Move:
-            if self.MoleType == "mole":
-                Screen.blit(MoleImage, (self.MoleX - 50, self.MoleY))
-            elif self.MoleType == "bomb":
-                Screen.blit(BombImage, (self.MoleX - 50, self.MoleY))
+        if self.move:
+            if self.mole_type == 'mole':
+                screen.blit(mole_image, (self.mole_x - 50, self.mole_y))
+            elif self.mole_type == 'bomb':
+                screen.blit(bomb_image, (self.mole_x - 50, self.mole_y))
 
     def show(self):
-        if self.Move:
-            self.Counter += 1
+        if self.move:
+            self.counter += 1
 
             # Mole is visible for 2 seconds
-            if self.Counter < 120:
-                if self.MoleY > self.HoleRow - 80:
-                    self.MoleY -= self.Speed
+            if self.counter < 120:
+                if self.mole_y > self.hole_row - 80:
+                    self.mole_y -= self.speed
 
             # Adjusted the y-coordinate
-            elif self.MoleY < self.HoleRow - 80:
-                self.MoleY += self.Speed * 3
+            elif self.mole_y < self.hole_row - 80:
+                self.mole_y += self.speed * 3
 
             else:
-                self.Move = False
-                self.Counter = 0
+                self.move = False
+                self.counter = 0
 
-    def isClicked(self, mousePos):
+    def is_clicked(self, mouse_pos):
         # Check if the mole is clicked by the mouse
-        if self.Move:
-            if self.MoleX - 50 < mousePos[0] < self.MoleX + 50 and self.MoleY < mousePos[1] < self.MoleY + 100:
+        if self.move:
+            if self.mole_x - 50 < mouse_pos[0] < self.mole_x + 50 and self.mole_y < mouse_pos[1] < self.mole_y + 100:
                 return True
         return False
 
 
-# ---------------------------------------#
-#           game class                   #
-# ---------------------------------------#
+# ---------------------------------------
+# Game class
+# ---------------------------------------
+
 
 class Game:
     def __init__(self):
-        self.Holes = []
-        self.Moles = []
-        self.Score = 0
-        self.Lives = 3
-        self.GameOver = False
-        self.GameOverCounter = 0
-        self.GameOverText = pygame.font.SysFont("comicsans", 100)
-        self.ScoreText = pygame.font.SysFont("comicsans", 50)
-        self.LivesText = pygame.font.SysFont("comicsans", 50)
+        self.holes = []
+        self.moles = []
+        self.score = 0
+        self.lives = 3
+        self.game_over = False
+        self.game_over_counter = 0
+        self.game_over_text = pygame.font.SysFont('comicsans', 100)
+        self.score_text = pygame.font.SysFont('comicsans', 50)
+        self.lives_text = pygame.font.SysFont('comicsans', 50)
 
         for row in range(3):
             for col in range(3):
-                self.Holes.append(Hole(row * 3 + col, col, row))
+                self.holes.append(Hole(row * 3 + col, col, row))
 
         for mole in range(3):
-            self.Moles.append(Mole("mole"))
+            self.moles.append(Mole('mole'))
 
-        self.Bomb = Mole("bomb")
+        self.bomb = Mole('bomb')
 
     def draw(self):
-        Screen.blit(Background, (0, 0))
+        screen.blit(background, (0, 0))
 
-        for mole in self.Moles:
+        for mole in self.moles:
             mole.draw()
 
-        self.Bomb.draw()
+        self.bomb.draw()
 
-        for hole in self.Holes:
+        for hole in self.holes:
             hole.draw()
 
-        score = self.ScoreText.render(f"Score: {self.Score}", 1, (255, 255, 255))
-        Screen.blit(score, (10, 10))
+        score = self.score_text.render(f'Score: {self.score}', 1, (255, 255, 255))
+        screen.blit(score, (10, 10))
 
-        lives = self.LivesText.render(f"Lives: {self.Lives}", 1, (255, 255, 255))
-        Screen.blit(lives, (WIDTH - lives.get_width() - 10, 10))
+        lives = self.lives_text.render(f'Lives: {self.lives}', 1, (255, 255, 255))
+        screen.blit(lives, (WIDTH - lives.get_width() - 10, 10))
 
-        if self.GameOver:
-            text = self.GameOverText.render("GAME OVER", 1, (255, 255, 255))
-            Screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+        if self.game_over:
+            text = self.game_over_text.render('GAME OVER', 1, (255, 255, 255))
+            screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
 
 
-# ---------------------------------------#
-#           main function                #
-# ---------------------------------------#
+# ---------------------------------------
+# main function
+# ---------------------------------------
+
 
 def main():
     game = Game()
-    inPlay = True
-    showUpTimer = 0
-    showUpEnd = 100
+    in_play = True
+    show_up_timer = 0
+    show_up_end = 100
 
-    while inPlay:
-        Screen.fill((0, 0, 0))
+    while in_play:
+        screen.fill((0, 0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                inPlay = False
+                in_play = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mousePos = pygame.mouse.get_pos()
-                for mole in game.Moles:
-                    if mole.isClicked(mousePos):
-                        game.Score += 1
-                        mole.Move = False
-                        mole.Counter = 0
+                for mole in game.moles:
+                    if mole.is_clicked(mousePos):
+                        game.score += 1
+                        mole.move = False
+                        mole.counter = 0
 
-                if game.Bomb.isClicked(mousePos):
-                    game.Lives -= 1
-                    game.Bomb.Move = False
-                    game.Bomb.Counter = 0
+                if game.bomb.is_clicked(mousePos):
+                    game.lives -= 1
+                    game.bomb.move = False
+                    game.bomb.counter = 0
 
-        if game.Lives <= 0:
-            game.GameOver = True
+        if game.lives <= 0:
+            game.game_over = True
 
             # turn off the game after 3 seconds
-            game.GameOverCounter += 1
-            if game.GameOverCounter >= 180:
-                inPlay = False
+            game.game_over_counter += 1
+            if game.game_over_counter >= 180:
+                in_play = False
 
-        if not game.GameOver:
-            showUpTimer += 1
-            if showUpTimer >= showUpEnd:
-
+        if not game.game_over:
+            show_up_timer += 1
+            if show_up_timer >= show_up_end:
                 # holes that are already taken
-                takenHoles = [mole.HoleNum for mole in game.Moles] + [game.Bomb.HoleNum]
+                taken_holes = [mole.hole_num for mole in game.moles] + [game.bomb.hole_num]
 
                 # select a new hole for each mole
-                for mole in game.Moles:
-                    if not mole.Move:
-                        mole.selectHole(takenHoles)
-                        takenHoles.append(mole.HoleNum)
+                for mole in game.moles:
+                    if not mole.move:
+                        mole.select_hole(taken_holes)
+                        taken_holes.append(mole.hole_num)
                         break
 
                 # select a new hole for the bomb
-                if not game.Bomb.Move:
-                    game.Bomb.selectHole(takenHoles)
+                if not game.bomb.move:
+                    game.bomb.select_hole(taken_holes)
 
-                showUpTimer = 0
+                show_up_timer = 0
 
-            for mole in game.Moles:
+            for mole in game.moles:
                 mole.show()
-            game.Bomb.show()
+            game.bomb.show()
 
         game.draw()
         pygame.display.update()
 
-        Clock.tick(FPS)
+        clock.tick(FPS)
 
     pygame.quit()
 

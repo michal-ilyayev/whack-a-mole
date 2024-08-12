@@ -1,2 +1,6 @@
 # PyGame
 pygame==2.5.2
+
+# Ruff
+ruff==0.5.7
+ruff-lsp==0.0.54
